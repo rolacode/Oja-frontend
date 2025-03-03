@@ -48,35 +48,59 @@ export default function LoginPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (validateForm()) {
-      setLoading(true)
-      setErrorMessage('')
-      
+      setLoading(true);
+      setErrorMessage("");
+  
       const loginEndpoints: Record<Role, string> = {
-        buyer: 'http://localhost:5000/v1/buyers/login',
-        vendor: 'http://localhost:5000/v1/vendors/login',
-        admin: 'http://localhost:5000/v1/admin/login',
-      }
-
+        buyer: "http://localhost:5000/v1/buyers/login",
+        vendor: "http://localhost:5000/v1/vendors/login",
+        admin: "http://localhost:5000/v1/admin/login",
+      };
+  
       try {
-        const response = await axios.post(loginEndpoints[formData.role], formData)
-
-        if (response.data.success) {
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('role', formData.role);
-          console.log('Redirecting to /shop...');
-          router.push('/shop');
+        const response = await axios.post(loginEndpoints[formData.role], formData);
+        console.log(" API Response:", response.data); // Debugging
+  
+        if (response.data.token) { // Checking token instead of success
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("role", formData.role); // Store role from form
+  
+          //  Delay execution slightly for smoother state update
+          setTimeout(() => {
+            switch (formData.role) {  
+              case "buyer":
+                console.log("✅ Redirecting to /shop...");
+                router.push("/shop");
+                break;
+              case "vendor":
+                console.log("✅ Redirecting to /dashboard...");
+                router.push("/dashboard");
+                break;
+              case "admin":
+                console.log("✅ Redirecting to /adminDashboard...");
+                router.push("/adminDashboard");
+                break;
+              default:
+                console.error("❌ Unknown role:", formData.role);
+                setErrorMessage("Invalid role. Please try again.");
+            }
+          }, 500);
         } else {
-          setErrorMessage(response.data.message || 'Login failed');
+          setErrorMessage(response.data.message || "Login failed");
         }
-      } catch (error) {
-        setErrorMessage('An error occurred during login. Please try again.');
+      } catch (error: any) {
+        console.error("❌ Login Error:", error.response?.data || error.message || error);
+        setErrorMessage(error.response?.data?.message || "An error occurred during login. Please try again.");
       } finally {
         setLoading(false);
       }
     }
-  }
+  };
+  
+  
+
 
   if (!isClient) {
     return null; // Prevent server-side rendering issues

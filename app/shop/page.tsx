@@ -1,25 +1,62 @@
-import { ProductCard } from "@/components/product-card"
+"use client";
 
-// This would typically come from an API or database
-const products = [
-  { id: '1', name: 'Classic T-Shirt', price: 10000, image: '/Images/T-shirts.jpeg' },
-  { id: '2', name: 'Denim Jeans', price: 20000, image: '/Images/Denim-Jacket.jpeg' },
-  { id: '3', name: 'Sneakers', price: 50000, image: '/Images/Sneakers.jpeg' },
-  { id: '4', name: 'Hoodie', price: 30000, image: '/Images/Hoodie.jpeg' },
-  { id: '5', name: 'Backpack', price: 20000, image: '/Images/Backpack.jpeg' },
-  { id: '6', name: 'Watch', price: 100000, image: '/Images/Wristwatch.jpeg' },
-]
+import { useEffect, useState } from "react";
+import axios from "axios";
 
-export default function ShopPage() {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold">In Stock</h1>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {products.map((product) => (
-          <ProductCard key={product.id} {...product} />
-        ))}
-      </div>
-    </div>
-  )
+interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
 }
 
+const Shop = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    axios
+      .get("http://localhost:5000/v1/vendors/product", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setProducts(response.data.products);
+      })
+      .catch((error) => {
+        console.error("❌ Failed to fetch products", error);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div>
+      <h1>Shop</h1>
+      {loading ? (
+        <p>Loading products...</p>
+      ) : (
+        products.map((product) => (
+          <div key={product._id}>
+            <h3>{product.name}</h3>
+            <p>{product.description}</p>
+            <p>${product.price}</p>
+            <img
+              src={product.image}
+              alt={product.name}
+              width="100"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/fallback.jpg"; // Use a local fallback image
+              }}
+            />
+          </div>
+        ))
+      )}
+    </div>
+  );
+};
+
+export default Shop;

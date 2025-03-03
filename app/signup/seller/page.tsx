@@ -110,7 +110,7 @@ export default function SellerSignupPage() {
             <h2 className="text-2xl font-bold text-center mb-6">Seller Sign Up</h2>
             
             <div className="space-y-2">
-              <Label htmlFor="businessName">Username/Business Name</Label>
+              <Label htmlFor="businessName">Business Name</Label>
               <Input
                 id="businessName"
                 name="businessName"

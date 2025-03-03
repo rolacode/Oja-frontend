@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState, useEffect } from 'react';
 
@@ -10,26 +10,20 @@ interface ToastProps {
   duration?: number;
 }
 
-// Create the useToast hook to manage the toasts
+// Create the useToast hook to manage toasts
 export function useToast() {
   const [toasts, setToasts] = useState<ToastProps[]>([]);
 
-  // This function is used to add a new toast
-  const addToast = ({ title, description, duration = 3000 }: Omit<ToastProps, 'id'>) => {
-    const id = Date.now(); // Use Date.now() to generate a unique id
+  // Function to add a new toast
+  const addToast = ({ title, description, duration = 3000 }: Omit<ToastProps, "id">) => {
+    const id = Date.now();
     setToasts((prevToasts) => [...prevToasts, { id, title, description, duration }]);
+
+    // Remove toast after duration
+    setTimeout(() => {
+      setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
+    }, duration);
   };
 
-  // Automatically remove expired toasts after the given duration
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setToasts((prevToasts) =>
-        prevToasts.filter((toast) => Date.now() - toast.id < toast.duration!)
-      );
-    }, 100);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  return { addToast, toasts }; // Return both the addToast function and the toasts array
+  return { addToast, toasts };
 }
