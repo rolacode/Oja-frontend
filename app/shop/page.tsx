@@ -41,17 +41,17 @@ const Shop = () => {
       ) : (
         products.map((product) => (
           <div key={product._id}>
-            <h3>{product.name}</h3>
-            <p>{product.description}</p>
-            <p>${product.price}</p>
             <img
               src={product.image}
               alt={product.name}
               width="100"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = "/fallback.jpg"; // Use a local fallback image
+                (e.target as HTMLImageElement).src = "/fallback.jpeg"; // Use a local fallback image
               }}
             />
+            <h3>{product.name}</h3>
+            <p>{product.description}</p>
+            <p>${product.price}</p>
           </div>
         ))
       )}
